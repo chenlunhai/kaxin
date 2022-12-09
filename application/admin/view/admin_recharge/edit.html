@@ -1,0 +1,58 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Uid')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-uid" class="form-control" name="row[uid]" type="number" value="{$row.uid|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Dojog')}:</label>
+        <div class="col-xs-12 col-sm-8">
+                        
+            <select  id="c-dojog" class="form-control selectpicker" name="row[dojog]">
+                {foreach name="dojogList" item="vo"}
+                    <option value="{$key}" {in name="key" value="$row.dojog"}selected{/in}>{$vo}</option>
+                {/foreach}
+            </select>
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Ctype')}:</label>
+        <div class="col-xs-12 col-sm-8">
+                        
+            <select  id="c-ctype" class="form-control selectpicker" name="row[ctype]">
+                {foreach name="ctypeList" item="vo"}
+                    <option value="{$key}" {in name="key" value="$row.ctype"}selected{/in}>{$vo}</option>
+                {/foreach}
+            </select>
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Numbers')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-numbers" class="form-control" step="0.01" name="row[numbers]" type="number" value="{$row.numbers|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Addtime')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-addtime" class="form-control datetimepicker" data-date-format="YYYY-MM-DD HH:mm:ss" data-use-current="true" name="row[addtime]" type="text" value="{$row.addtime}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Operateid')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-operateid" class="form-control" name="row[operateid]" type="number" value="{$row.operateid|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

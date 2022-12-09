@@ -1,0 +1,4 @@
+<?php
+//000000000000
+ exit();?>
+a:10:{s:8:"app_init";a:3:{i:0;s:21:"\addons\alioss\Alioss";i:1;s:17:"\addons\epay\Epay";i:2;s:25:"\addons\wanlshop\Wanlshop";}s:18:"upload_config_init";a:1:{i:0;s:21:"\addons\alioss\Alioss";}s:13:"upload_delete";a:1:{i:0;s:21:"\addons\alioss\Alioss";}s:8:"sms_send";a:1:{i:0;s:21:"\addons\alisms\Alisms";}s:10:"sms_notice";a:1:{i:0;s:21:"\addons\alisms\Alisms";}s:9:"sms_check";a:1:{i:0;s:21:"\addons\alisms\Alisms";}s:11:"leesignhook";a:1:{i:0;s:23:"\addons\leesign\Leesign";}s:11:"config_init";a:1:{i:0;s:25:"\addons\nkeditor\Nkeditor";}s:18:"user_sidenav_after";a:2:{i:0;s:21:"\addons\signin\Signin";i:1;s:25:"\addons\wanlshop\Wanlshop";}s:7:"upgrade";a:1:{i:0;s:25:"\addons\wanlshop\Wanlshop";}}

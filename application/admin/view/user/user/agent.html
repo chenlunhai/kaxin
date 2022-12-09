@@ -1,0 +1,68 @@
+<div class="panel panel-default panel-intro">
+    {:build_heading()}
+
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                        {:build_toolbar('refresh,edit,del')}
+                        <div class="dropdown btn-group {:$auth->check('user/user/multi')?'':'hide'}">
+                            <a class="btn btn-primary btn-more dropdown-toggle btn-disabled disabled" data-toggle="dropdown"><i class="fa fa-cog"></i> {:__('More')}</a>
+                            <ul class="dropdown-menu text-left" role="menu">
+                                <li><a class="btn btn-link btn-multi btn-disabled disabled" href="javascript:;" data-params="status=normal"><i class="fa fa-eye"></i> {:__('Set to normal')}</a></li>
+                                <li><a class="btn btn-link btn-multi btn-disabled disabled" href="javascript:;" data-params="status=hidden"><i class="fa fa-eye-slash"></i> {:__('Set to hidden')}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           width="100%">
+                        <tr><td>用户名</td><td>手机号</td><td>代理区域</td><td>已结算</td><td>未结算</td><td>查看详情</td><td>操作</td></tr>
+                        {volist name="result.rows" id="data" offset="0" length="3" mod="3" empty="$empty" key="i"}
+                        <tr><td>{$data.username}</td><td>{$data.mobile}</td><td>{$data.agent}</td><td>{$data.checked}</td><td>{$data.uncheck}</td><td>查看详情</td><td onclick="calc({$data.id}, {$data.agentgrade})"><i style="color:red">结算</i></td></tr>
+                        {/volist}
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div><!-- comment -->
+<script>
+    function calc(uid, grade) {
+    if (grade == 2){
+    layer.confirm("市级代理半月会自动结算，确认此时结算？", {btn: ['确定', '取消'], title: "提示"}, function () {
+    $.ajax({
+    url: "user/user/agent",
+            data: {uid: uid},
+            success: function (result) {
+            var icon = 2;
+            if (result.code == 0){
+            icon = 1;
+            }
+            layer.msg(result.msg, {icon: icon});
+            location.reload();
+            }});
+    });
+    } else{
+    layer.confirm("确认结算省代加速？", {btn: ['确定', '取消'], title: "提示"}, function () {
+    $.ajax({
+    url: "user/user/agent",
+            data: {uid: uid},
+            success: function (result) {
+            var icon = 2;
+            if (result.code == 0){
+            icon = 1;
+            }
+            layer.msg(result.msg, {icon: icon});
+            location.reload();
+            }});
+    });
+    }
+
+    }
+
+
+
+
+</script>

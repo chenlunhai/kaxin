@@ -1,0 +1,138 @@
+<style type="text/css">
+    #c-express_name{
+        width: 300px;
+        display: block;
+    }
+    .control-label span{
+        font-weight: normal;
+        color: #777;
+    }
+</style>
+<form id="edit-form" role="form" data-toggle="validator" method="POST" action="">
+    <div class="form-group">
+        <label for="shopname" class="control-label">快递公司:</label>
+        <select id="c-express_name" name="row[express_name]" class="form-control" data-rule="required">
+            <option value="">请选择快递公司</option>
+            {volist name="kuaidiList" id="vo"}
+            <option value="{$vo.code}">{$vo.name}</option>
+            {/volist}
+        </select> 
+    </div>
+
+    <div class="form-group">
+        <label for="shopname" class="control-label">快递单:</label>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>订单号</th>
+                    <th>状态</th>
+                    <th>姓名</th>
+                    <th>手机</th>
+                    <th>地区</th>
+                    <th>快递单号</th>
+                    <th>POS機SN</th>
+                </tr>
+            </thead>
+            <tbody>
+                {volist name="lists" id="order"}
+                <?php  $a=0;?>
+                <tr>
+                    <th style="text-align: center; vertical-align: middle;" scope="row">{$order.id}</th>
+                    <td style="text-align: center; vertical-align: middle;">{$order.order_no}</td>
+                    <td style="vertical-align: middle;"><span class="text-blue">{$order.state_text}</span></td>
+                    <td style="text-align: center; vertical-align: middle;">{$order.address.name}</td>
+                    <td style="text-align: center; vertical-align: middle;">{$order.address.mobile}</td>
+                    <td style="vertical-align: middle;">{$order.address.address}</td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <input type="hidden" name="row[order][id][]" value="{$order.id}">
+                        <input id="c-express_no" data-rule="required" class="form-control" name="row[order][express_no][]" type="text" value="">
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <div id="choose<?php echo $a;?>"></div>
+                        <input type="hidden" name="possn[]" id="hiddensn<?php echo $a;?>"  value="">
+                        <input id="inputsn<?php echo $a;?>" data-rule="required" class="form-control"  type="text" value="" onkeyup="getpossn(<?php echo $a;?>)">
+                        <div id="showsn<?php echo $a;?>"></div>
+                        <?php $a++;?>
+                    </td>
+                </tr>
+                {/volist}
+
+                {volist name="data" id="order"}
+                <tr>
+                    <th style="text-align: center; vertical-align: middle;" scope="row">{$order.id}</th>
+                    <td style="text-align: center; vertical-align: middle;">{$order.order_no}</td>
+                    <td style="vertical-align: middle;"><span class="text-blue">{$order.state_text}</span></td>
+                    <td style="text-align: center; vertical-align: middle;">{$order.address.name}</td>
+                    <td style="text-align: center; vertical-align: middle;">{$order.address.mobile}</td>
+                    <td style="vertical-align: middle;">{$order.address.address}</td>
+                    <td style="text-align: center; vertical-align: middle;"><input class="form-control" type="text" value="" placeholder="此订单不可发货 填单" disabled></td>
+                </tr>
+                {/volist}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- <div class="form-group">
+            <label for="shopname" class="control-label">设置订单: <span>（开启后将所选订单设置为发货）</span></label>
+            <p>{:Form::switcher('row[setorder]', '0', ['color'=>'info'])}</p>
+    </div> -->
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-1"></label>
+        <div class="col-xs-12 col-sm-10">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function getpossn(from) {
+        var sn = $("#inputsn"+from).val();
+
+        if (sn.length > 2) {
+            var url = "{:url('/api/wanlshop/kaxin/getpossn')}";
+            console.log(sn, '666666666666666666')
+            $.ajax({
+                type: "post",
+                url: url,
+                data: {"sn": sn},
+                success(res) {
+                    if (res.code == 1) {
+                        var data = res.data
+                        var html = "";
+                        var i = 0;
+                        var posstr = "";
+                        for (i = 0; i < data.length; i++) {
+                            html += "<span onclick='choose(\"" + data[i].possn.toString() + "\","+from+")'>" + data[i].possn.toString() + "</span>";
+
+                        }
+                        $("#showsn"+from).append(html);
+
+                        console.log(data)
+                    }
+
+                }
+            })
+        }
+
+    }
+    function choose(sn,from) {
+        console.log(sn)
+        var html = "<span>" + sn + "</span>";
+        var hidden = $("#hiddensn"+from).val()
+        console.log(hidden, 'hhhhhhhhhhhhhh')
+        if (hidden.indexOf(sn) > -1) {
+            alert("SN已被选择")
+            return;
+        }
+         hidden = hidden + "," + sn;
+  
+        $("#hiddensn"+from).val(hidden);
+        $("#choose"+from).append(html);
+        $("#showsn"+from).children().remove();
+    }
+
+
+</script>

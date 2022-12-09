@@ -1,0 +1,98 @@
+<link rel="stylesheet" href="https://keep.wdsdl.com/assets/libs/bootstrap-table/dist/bootstrap-table.min.css" />>
+
+<div class="commonsearch-table">
+	<form class="form-horizontal form-commonsearch nice-validator n-default n-bootstrap" novalidate="" method="post" action="">
+		<fieldset>
+			<div class="row">
+
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
+					<label for="user.nickname" class="control-label col-xs-4">买家</label>
+					<div class="col-xs-8">
+						<input type="hidden" class="form-control operate" name="user.nickname-operate" data-name="user.nickname" value="=" readonly="">
+						<input type="text" class="form-control" name="user.nickname" value="" placeholder="买家" id="user.nickname" data-index="2">
+					</div>
+				</div>
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
+					<label for="state" class="control-label col-xs-4">订单状态</label>
+					<div class="col-xs-8">
+						<input type="hidden" class="form-control operate" name="state-operate" data-name="state" value="=" readonly="">
+						<select class="form-control" name="state">
+							<option value="">选择</option>
+							<option value="1">3000</option>
+							<option value="2">5000</option>
+							<option value="3">15000</option>
+							<option value="4">30000</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
+					<label for="order_no" class="control-label col-xs-4">订单号</label>
+
+					<div class="col-xs-8">
+						<input type="hidden" class="form-control operate" name="order_no-operate" data-name="order_no" value="=" readonly="">
+						<input type="text" class="form-control" name="order_no" value="" placeholder="订单号" id="order_no" data-index="3">
+					</div>
+				</div>
+
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
+					<label for="createtime" class="control-label col-xs-4">开始时间</label>
+					<div class="col-xs-8">
+						<input type="hidden" class="form-control operate" name="createtime-operate" data-name="createtime" value="RANGE" readonly="">
+						<input type="date" class="form-control datetimerange" name="createtime" value="" placeholder="创建时间" id="createtime" data-index="6">
+					</div>
+				</div>
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
+					<label for="paymenttime" class="control-label col-xs-4">结束时间</label>
+					<div class="col-xs-8">
+						<input type="hidden" class="form-control operate" name="paymenttime-operate" data-name="paymenttime" value="RANGE" readonly="">
+						<input type="date" class="form-control datetimerange" name="paymenttime" value="" placeholder="付款时间" id="paymenttime" data-index="7">
+					</div>
+				</div>
+
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
+					<div class="col-sm-8 col-xs-offset-4">
+						<button type="submit" class="btn btn-success" formnovalidate="">提交</button>
+						<button type="reset" class="btn btn-default">重置</button>
+
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</form>
+</div>
+<div class="bootstrap-table">
+	<div class="row row-flex">
+		<div class="col-sm-12" style="margin-bottom: 15px;">
+			<table class="table table-bordered table-striped table-hover table-nowrap">
+				<thead>
+					<tr>
+						<th class="text-center">
+							<div class="th-inner">
+								<strong>商品</strong>
+							</div>
+						</th>
+						<th class="fix-108">
+							<div class="th-inner">单价</div>
+						</th>
+						<th class="fix-108">
+							<div class="th-inner">数量</div>
+						</th>
+						<th class="fix-108">
+							<div class="th-inner">买家</div>
+						</th>
+						<th class="fix-108">
+							<div class="th-inner">实际支付</div>
+						</th>
+						<th class="fix-108">
+							<div class="th-inner">状态</div>
+						</th>
+						<th class="fix-108">
+							<div class="th-inner">操作</div>
+						</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		{$list}
+	</div>

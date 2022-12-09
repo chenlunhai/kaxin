@@ -1,0 +1,151 @@
+
+
+<div class="card" style="background: #ffffff; border: 1px solid #cccccc;">
+    <div class="card-header bg-gray-light" style="padding: 15px; border-bottom: 1px solid #cccccc;">
+        市场图
+    </div>
+    <div class="card-body" style="padding: 15px;">
+        <div class="card">
+            <div class="card-header" style="padding: 15px; border: 1px solid #CCCCCC;">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input type="text" class="form-control" id="userId" placeholder="用户ID或用户名">
+                    </div>
+                    <button type="button" class="btn btn-primary mb-2" id="searchUserId">搜索</button>
+                </form>
+            </div>
+            <div class="card-body" id="data-box" style="padding: 15px;">
+                <div class="market-tree">
+                    <div class="row">
+                        <div class="col-sm-4 col-xs-4">
+                        </div>
+                        <div id="lv-1-0" class="col-sm-4 col-xs-4">
+
+                        </div>
+                        <div class="col-sm-4 col-xs-4">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 col-xs-2">
+                        </div>
+                        <div id="lv-2-0" class="col-sm-3 col-xs-3">
+
+                        </div>
+                        <div class="col-sm-2 col-xs-2">
+                        </div>
+                        <div id="lv-2-1" class="col-sm-3 col-xs-3">
+
+                        </div>
+                        <div class="col-sm-2 col-xs-2">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="lv-3-0" class="col-sm-3 col-xs-3">
+
+                        </div>
+                        <div id="lv-3-1" class="col-sm-3 col-xs-3">
+
+                        </div>
+                        <div id="lv-3-2" class="col-sm-3 col-xs-3">
+
+                        </div>
+                        <div id="lv-3-3" class="col-sm-3 col-xs-3">
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<style>
+    .market-tree {
+        text-align: center;
+    }
+
+    .market-tree table {
+        border-color: #cccccc;
+    }
+
+    .market-tree th {
+        text-align: center;
+        height: 30px;
+    }
+
+    .market-tree td {
+        text-align: center;
+        width: 50%;
+        height: 30px;
+    }
+
+    .market-tree div {
+        padding: 0;
+    }
+    .touser{
+        color: #000000;
+        font-weight: bold;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .toparent{
+        color: #0d95e8;
+        cursor: pointer;
+    }
+
+    table td {
+        text-align: left;
+        padding-left: 5px;
+    }
+
+    .addTable {
+        width: 16px;
+        height: 16px;
+        background: #000000;
+        color: #ffffff;
+        text-align: center;
+        line-height: 16px;
+        vertical-align: middle;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .subTable {
+        width: 16px;
+        height: 16px;
+        background: #000000;
+        color: #ffffff;
+        text-align: center;
+        line-height: 16px;
+        vertical-align: middle;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 600;
+        display: none;
+    }
+
+    .leaf {
+        width: 16px;
+        height: 16px;
+        background: #000000;
+        color: #ffffff;
+        text-align: center;
+        line-height: 16px;
+        vertical-align: middle;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 600;
+        visibility: hidden;
+        display: inline-block;
+    }
+
+    .username {
+        margin-left: 3px;
+    }
+</style>

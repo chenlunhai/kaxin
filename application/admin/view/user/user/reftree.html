@@ -1,0 +1,302 @@
+
+<div class="card" style="background: #ffffff; border: 1px solid #cccccc;">
+    <div class="card-header bg-gray-light" style="padding: 15px; border-bottom: 1px solid #cccccc;">
+        推荐图
+    </div>
+    <div class="card-body" style="padding: 15px;">
+        <div class="card">
+            <div class="card-header" style="padding: 15px; border: 1px solid #CCCCCC;">
+
+                <div class="form-group mx-sm-3 mb-2">
+                    <input type="text" class="form-control" id="userId" placeholder="用户ID或用户名">
+                </div>
+<!--                <button class="layui-btn ns-bg-color" lay-submit lay-filter="search" id="search" >筛选</button>
+                <button type="button" class="btn btn-primary mb-2" id="searchUserId" >搜索</button>-->
+
+            </div>
+            <!--            <div class="card-body" id="data-box" style="padding: 15px;">
+            
+                        </div>-->
+
+            <div id="clbk" class="demo"></div>
+            <div id="s" class="demo"></div>
+            <input type='hidden' id="flag"value="0"/>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/jquery-3.1.1.js"></script>
+<script src="/assets/js/jstree.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+<script>
+                    // html demo
+                    $(function () {
+                        $('#clbk').jstree();
+
+                        $('#search').on('click', function () {
+                            $('.demo').eq(0).hide();
+                            let data = {
+                                id: 0,
+                                userId: $('#userId').val()
+                            };
+                            $.ajax({
+                                url: "user/user/reftree",
+                                data: data,
+                                dataType: 'JSON',
+                                type: 'POST',
+                                async: false,
+                                success: function (res) {
+                                    if (true) {
+                                        $('#s').jstree({
+                                            'core': {
+                                                'data': function (node, cb) {
+                                                    console.log(res, 'resssss');
+                                                    console.log(node);
+                                                    if (node.id === "#") {
+                                                        cb([{"text": res.data.i.nickname, "id": res.data.i.member_id, "children": true}]);
+                                                    } else {
+                                                        $.ajax({
+                                                            url: 'user/user/reftree',
+                                                            type: 'post',
+                                                            data: {
+                                                                id: node.id
+                                                            
+                                                            },
+                                                            dataType: "json",
+                                                            success: function (a) {
+                                                                cb(a);
+                                                                //  cb(a);
+                                                            }
+                                                        });
+
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        layer.msg('查找失败');
+                                    }
+                                }
+                            });
+                        });
+
+
+                    });
+
+
+                    $('#html').jstree();
+                    // inline data demo
+                    $('#data').jstree({
+                        'core': {
+                            'data': [
+                                {"text": "Root node", "children": [
+                                        {"text": "Child node 1"},
+                                        {"text": "Child node 2"}
+                                    ]}
+                            ]
+                        }
+                    });
+                    // data format demo
+                    $('#frmt').jstree({
+                        'core': {
+                            'data': [
+                                {
+                                    "text": "Root node",
+                                    "state": {"opened": true},
+                                    "children": [
+                                        {
+                                            "text": "Child node 1",
+                                            "state": {"selected": true},
+                                            "icon": "jstree-file"
+                                        },
+                                        {"text": "Child node 2", "state": {"disabled": true}}
+                                    ]
+                                }
+                            ]
+                        }
+                    });
+                    // ajax demo
+                    $('#ajax').jstree({
+                        'core': {
+                            'data': {
+                                "url": "./root.json",
+                                "dataType": "json" // needed only if you do not supply JSON headers
+                            }
+                        }
+                    });
+                    // lazy demo
+                    $('#lazy').jstree({
+                        'core': {
+                            'data': {
+                                "url": "//www.jstree.com/fiddle/?lazy",
+                                "data": function (node) {
+                                    return {"id": node.id};
+                                }
+                            }
+                        }
+                    });
+
+
+                    var nickname, member_id;
+                    function ms() {
+                        $('.demo').eq(0).hide();
+                        let data = {
+                            id: 0,
+                            userId: $('#userId').val()
+                        };
+                        $.ajax({
+                            url: "user/user/reftree",
+                            data: data,
+                            dataType: 'JSON',
+                            type: 'POST',
+                            async: false,
+                            success: function (res) {
+                                if (true) {
+                                    $('#s').jstree({
+                                        'core': {
+                                            'data': function (node, cb) {
+                                                console.log(res, 'resssss');
+                                                console.log(node);
+                                                if (node.id === "#") {
+                                                    cb([{"text": res.data.i.nickname, "id": res.data.i.member_id, "children": true}]);
+                                                } else {
+                                                    $.ajax({
+                                                        url: 'user/user/reftree',
+                                                        type: 'post',
+                                                        data: {
+                                                            id: node.id
+                                                        },
+                                                        dataType: "json",
+                                                        success: function (a) {
+                                                            cb(a);
+                                                            //  cb(a);
+                                                        }
+                                                    });
+
+                                                }
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    layer.msg('查找失败');
+                                }
+                            }
+                        });
+                    }
+
+
+                    // data from callback
+                    $('#clbk').jstree({
+                        'core': {
+                            'data': function (node, cb) {
+                                if (node.id === "#") {
+                                    cb([{"text": "18888888888", "id": "1", "children": true}]);
+                                } else {
+                                    var sa=$("#userId").val()
+                                    var falg=$("#flag").val()
+                                    if(sa!=""&&falg==0){
+                                        id=sa
+                                        falg=1
+                                      $("#flag").val(1);
+                                    }else{
+                                        id=node.id
+                                    }
+                                    console.log(sa,'node.idnode.idnode.id')
+                                    $.ajax({
+                                        url: 'user/user/reftree',
+                                        type: 'post',
+                                        data: {
+                                            id:id,
+                                            flag:falg
+                                        },
+                                        dataType: "json",
+                                        success: function (a) {
+                                            console.log(a, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                                         $("#flag").val(0);
+                                         $("#userId").val("")
+                                            cb(a);
+                                          
+                                            //  cb(a);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    );
+                    // interaction and events
+                    $('#evts_button').on("click", function () {
+                        var instance = $('#evts').jstree(true);
+                        instance.deselect_all();
+                        instance.select_node('1');
+                    });
+                    $('#evts')
+                            .on("changed.jstree", function (e, data) {
+                                if (data.selected.length) {
+                                    alert('The selected node is: ' + data.instance.get_node(data.selected[0]).text);
+                                }
+                            })
+                            .jstree({
+                                'core': {
+                                    'multiple': false,
+                                    'data': [
+                                        {"text": "Root node", "children": [
+                                                {"text": "Child node 1", "id": 1},
+                                                {"text": "Child node 2"}
+                                            ]}
+                                    ]
+                                }
+                            });
+</script>
+
+<style>
+    table td {
+        text-align: left;
+        padding-left: 5px;
+    }
+
+    .addTable {
+        width: 16px;
+        height: 16px;
+        background: #000000;
+        color: #ffffff;
+        text-align: center;
+        line-height: 16px;
+        vertical-align: middle;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .subTable {
+        width: 16px;
+        height: 16px;
+        background: #000000;
+        color: #ffffff;
+        text-align: center;
+        line-height: 16px;
+        vertical-align: middle;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 600;
+        display: none;
+    }
+
+    .leaf{
+        width: 16px;
+        height: 16px;
+        background: #000000;
+        color: #ffffff;
+        text-align: center;
+        line-height: 16px;
+        vertical-align: middle;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 600;
+        visibility: hidden;
+        display: inline-block;
+    }
+    .username{
+        margin-left: 3px;
+    }
+</style>
