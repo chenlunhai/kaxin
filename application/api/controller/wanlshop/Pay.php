@@ -148,7 +148,7 @@ class Pay extends Api {
                         // 总价格
                         $price += $row['price'];
                     }
-                    $this->withdrawchange($price, $this->auth->id, $account,$order_id);
+                    $this->withdrawchange($price, $this->auth->id, $account, $order_id);
                 }
                 if ($wuliu == 0 or $wuliu == 2) {
 
@@ -299,7 +299,7 @@ class Pay extends Api {
      * 删除提现账户
      */
     public function delPayAccount($ids = '') {
-           $this->error(__('绑定银行卡不可以删除'));
+        $this->error(__('绑定银行卡不可以删除'));
         $row = model('app\api\model\wanlshop\PayAccount')
                 ->where('id', 'in', $ids)
                 ->where(['user_id' => $this->auth->id])
@@ -326,6 +326,7 @@ class Pay extends Api {
             $this->success('ok', [
                 'money' => $this->auth->money,
                 'servicefee' => $config['withdraw']['servicefee'],
+                'extrafee'=>$config['withdraw']['extrafee'],
                 'bank' => $bank
             ]);
         }
@@ -373,31 +374,32 @@ class Pay extends Api {
 
 
             $count = \think\Db::name("withdraw")->where(["user_id" => $this->auth->id])->order("id desc")->find();
-            if ($count) {
-                if (date("Y-m-d", $count["createtime"]) == date("Y-m-d", time())) {
-                    $this->error("每天只可提现一次！");
-                }
-            }
-
-            // 计算提现手续费
-//            if ($config['withdraw']['servicefee'] && $config['withdraw']['servicefee'] > 0) {
-//                $servicefee = number_format($money * $config['withdraw']['servicefee'] / 1000, 2);
-//                $handingmoney = $money - 2 * number_format($money * $config['withdraw']['servicefee'] / 1000, 2);
-//            } else {
-//                $servicefee = 0;
-//                $handingmoney = $money;
+//            if ($count) {
+//                if (date("Y-m-d", $count["createtime"]) == date("Y-m-d", time())) {
+//                    $this->error("每天只可提现一次！");
+//                }
 //            }
 
-            $handingmoney = $money;
-            // $handingmoney = $money - 5;
+            //  计算提现手续费
+            if ($config['withdraw']['servicefee'] && $config['withdraw']['servicefee'] > 0) {
+                $servicefee=$money * $config['withdraw']['servicefee']/1000;
+                $money= round($money,2);
+                 $handingmoney = $money - $servicefee-$config['withdraw']['extrafee']; 
+            } else {
+                $servicefee = 0;
+                $handingmoney = $money;
+            }
+
+        //    $handingmoney = $money;
+            //$handingmoney = $money - $config['withdraw']['extrafee'];
             $account_name = $this->request->post('account_name');
             Db::startTrans();
             try {
                 $data = [
                     'user_id' => $this->auth->id,
                     'money' => $handingmoney,
-                    'handingfee' => 0, //$servicefee, // 手续费
-                    'taxes' => 0, //number_format($money * $config['withdraw']['servicefee'] / 1000, 2),
+                    'handingfee' => $servicefee, // 手续费
+                    'taxes' => $config['withdraw']['extrafee'],
                     'type' => $account['bankCode'],
                     'account' => $account['cardCode'],
                     'orderid' => date("Ymdhis") . sprintf("%08d", $this->auth->id) . mt_rand(1000, 9999),
@@ -418,7 +420,7 @@ class Pay extends Api {
         $this->error(__('非正常请求'));
     }
 
-    public function withdrawchange($money, $uid, $account,$order_id) {
+    public function withdrawchange($money, $uid, $account, $order_id) {
         //设置过滤方法
         // 查询提现账户
         $config = get_addon_config('wanlshop');
@@ -426,7 +428,7 @@ class Pay extends Api {
         $account_name = $this->request->post('account_name');
         if ($config['withdraw']['servicefee'] && $config['withdraw']['servicefee'] > 0) {
             $servicefee = number_format($money * $config['withdraw']['servicefee'] / 1000, 2);
-            $handingmoney = $money -  number_format($money * $config['withdraw']['servicefee'] / 1000, 2);
+            $handingmoney = $money - number_format($money * $config['withdraw']['servicefee'] / 1000, 2);
         } else {
             $servicefee = 0;
             $handingmoney = $money;
@@ -441,7 +443,7 @@ class Pay extends Api {
                 'type' => $account['bankCode'],
                 'account' => $account['cardCode'],
                 'orderid' => date("Ymdhis") . sprintf("%08d", $this->auth->id) . mt_rand(1000, 9999),
-                'fromorder'=>$order_id[0]
+                'fromorder' => $order_id[0]
 //                'bankname' => $account["bankName"],
 //                'accountname' => $account_name
             ];
@@ -611,8 +613,8 @@ class Pay extends Api {
     }
 
     public function getBalanc2e() {
-        
-        $remain =Db::table("static_instance")->where(["user_id"=>$this->auth->id])->sum("remain_num");
+
+        $remain = Db::table("static_instance")->where(["user_id" => $this->auth->id])->sum("remain_num");
 
         $this->success('ok', $remain);
     }

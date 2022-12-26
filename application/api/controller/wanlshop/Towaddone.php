@@ -95,19 +95,21 @@ class Towaddone {
         }
     }
 
-    public static function SnActive($uid, $sn) {
-
+    public static function SnActive($uid, $sn, $bid) {
         $archiveMoney = \app\api\controller\Tools::getConfig1("archivemoney");
         $uInfo = Db::name("user")->where(["id" => $uid])->find();
         $snInfo = Db::name("kaxin_user_sn")->where(["snid" => $sn])->find();
         $OwnInfo = Db::name("user_team")->where(["uid" => $uid])->find();
-        if ($OwnInfo["own_money"] >= $archiveMoney and $snInfo["status"] == 0) {
+        $bFunds = Db::name("kaxin_brandtax")->where(["bid" => $bid])->find();
+        $funds_array = explode(",", $bFunds["money"]);
+        if ($OwnInfo["own_money"] >= $funds_array[0] and $snInfo["status"] == 0) {
+             self::bonus($uid, $funds_array[0], "用户激活奖励", '99_'.$sn);
             Db::name("kaxin_user_sn")->where(["snid" => $sn])->update(["status" => '1', 'udpatetime' => time()]);
         }
     }
 
     public static function AddTeamInfo($sn, $money) {
-        $snInfo = Db::name("kaxin_user_sn")->where(["snid" => $sn])->find();
+        $snInfo = Db::name("kaxin_user_sn")->where(["snid" => $sn, "belongsto" => 0])->find();
         if ($snInfo) {
             $uInfo = Db::name("user")->where(["id" => $snInfo["uid"]])->find();
             $pInfo = explode(',', $uInfo["pids"]);
@@ -115,7 +117,7 @@ class Towaddone {
             Db::name("user_team")->whereIn("uid", $pInfo)->setInc("todayorder", $money);
             Db::name("user_team")->where(["uid" => $snInfo["uid"]])->setInc("own_money", $money);
             $posInfo = Db::name("kaxin_pos")->where(["possn" => $sn])->find();
-            self::SnActive($snInfo["uid"], $sn);
+            self::SnActive($snInfo["uid"], $sn, $posInfo["bid"]);
             self::KaxinUserLevel($uInfo["pids"]);
             dump($uInfo["pids"]);
 //            dump($money);
@@ -159,6 +161,7 @@ class Towaddone {
                     $tax = $funds_array[$uInfo["level"] - 1];
                 }
                 if ($tax > 0) {
+                    $tax = $tax / 10000;
                     self::bonus($value, $tax * $money, "L" . $uInfo["level"] . "级差奖励", $from);
                     $temp = $uInfo["level"];
                 }
@@ -184,19 +187,18 @@ class Towaddone {
                     }
                     $sonlist = Db::name("user")->where(["pid" => $value])->select();
                     $counta = 0;
-                    $ids="";
+                    $ids = "";
                     foreach ($sonlist as $k => $v) {
                         $hasInfo = Db::name("user_relationship")->where(["uid" => $v])->find();
                         if ($hasInfo) {
                             $counta += 1;
-                            $ids+=$v.",";
+                            $ids += $v . ",";
                         }
                     }
-                    if($counta==2){
-                         Db::name("user_relationship")->where(["uid" => $value])->update(["vip"=>1,"pid"=>0]);
-                         $ids_array= explode(",", $ids);
+                    if ($counta == 2) {
+                        Db::name("user_relationship")->where(["uid" => $value])->update(["vip" => 1, "pid" => 0]);
+                        $ids_array = explode(",", $ids);
                     }
-                    
                 }
                 if ($pinfo["vip"] == 1 and $a == 0) {
                     \app\common\model\User::money(300, $value, '直推奖励');

@@ -20,6 +20,7 @@ class Client extends Backend
         parent::_initialize();
 		// 调用配置
 		$config = get_addon_config('wanlshop');
+                
 		// 升级配置文件
 		$update = false;
 		// 检测 1.0.1更新

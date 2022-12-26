@@ -200,7 +200,12 @@ class Callback extends Api {
     }
 
     public function test() {
-        Towaddone::KaxinUserLevel("2794,2791,2857,2856,2855,2751,2750,2749,2748,2705,2678,2657,2654,2651,2650,2649,2595,0");
+        
+         $data = input();
+        
+        
+          return json(["code" => -1, "msg" =>$data]);
+        //Towaddone::KaxinUserLevel("2794,2791,2857,2856,2855,2751,2750,2749,2748,2705,2678,2657,2654,2651,2650,2649,2595,0");
     }
     
     public function RemotenMerchantTrade() {

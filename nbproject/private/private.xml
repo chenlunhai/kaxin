@@ -3,19 +3,33 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/admin/controller/user/User.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/common/controller/Frontend.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/api/controller/wanlshop/Kaxin.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/build.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/admin/library/traits/Backend.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/index/controller/Index.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/api/controller/wanlshop/Pay.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/api/controller/wanlshop/Order.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/config.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/index/lang/zh-cn/index.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/api/controller/wanlshop/Callback.php</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/index/view/index/index.html</file>
-            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/application/api/controller/wanlshop/Towaddone.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/User.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/addons/wanlshop/library/WanlPay/WanlPay.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/Teamwork.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/view/layout/default.html</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/controller/wanlshop/Withdraw.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/Order.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/view/wanlshop/client/config.html</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/controller/wanlshop/Client.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/addons/wanlshop/library/AutoProject/temp/project/common/config/config.js</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/addons/alisms/library/Alisms.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/Callback.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/Sms.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/addons/wanlshop/config.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/Ems.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/common/controller/Dosth.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/Pay.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/Towaddone.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/view/common/menu.html</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/User.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/common/library/Sms.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/controller/Addon.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/addons/wanlshop/controller/Index.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/model/wanlshop/Brand.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/extend/fast/Http.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/controller/Agent.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/admin/library/traits/Backend.php</file>
+            <file>file:/D:/phpstudy_pro/WWW/jdb_ey3pdL/kaxin/application/api/controller/wanlshop/Kaxin.php</file>
         </group>
     </open-files>
 </project-private>

@@ -28,6 +28,7 @@ class CRateConfig extends Backend
     public function import()
     {
         parent::import();
+       
     }
 
     /**

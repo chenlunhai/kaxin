@@ -71,7 +71,9 @@ define(['jquery', 'bootstrap', 'moment', 'moment/locale/zh-cn', 'bootstrap-table
             refreshbtn: '.btn-refresh',
             addbtn: '.btn-add',
             editbtn: '.btn-edit',
+            turnbt:'.btn-turn',
             delbtn: '.btn-del',
+            turnbtn: '.btn-turn',
             checkoutbtn: '.btn-chckout',
             importbtn: '.btn-import',
             multibtn: '.btn-multi',
@@ -398,6 +400,17 @@ define(['jquery', 'bootstrap', 'moment', 'moment/locale/zh-cn', 'bootstrap-table
                                 Layer.close(index);
                             }
                     );
+                });
+                   toolbar.on('click', Table.config.turnbtn, function () {
+                    var that = this;
+                    var ids = Table.api.selectedids(table);
+                   var url = options.extend.turn_url;
+                            console.log(url,'uuuuuuuuu')
+                            if (url.indexOf("ids") == -1) {
+                                 url = Table.api.replaceurl(url, {ids: ids.length > 0 ? ids.join(",") : 0}, table);
+                             }
+                             Fast.api.open(url, __('机具转让'), $(this).data() || {});
+                            
                 });
                 toolbar.on('click', Table.config.checkoutbtn, function () {
                     var that = this;

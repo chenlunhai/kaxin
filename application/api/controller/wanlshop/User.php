@@ -332,15 +332,20 @@ class User extends Api {
             $limit = $this->request->post('limit') ?? 10;
             $type = $this->request->post('type');
             $order = $this->request->post('order');
-            $fist = \think\Db::name("user")->where(["pid" => $user->id])->field("id,nickname,avatar,jointime,level")->limit($offset * $limit, $limit)->select();
+            
+            $puser=\think\Db::name("user")->where(["id"=>$user["pid"]])->find();
+            
+            $fist = \think\Db::name("user")->where(["pid" => $user->id])->field("id,nickname,avatar,jointime,level,mobile")->limit($offset * $limit, $limit)->select();
             $fcount = \think\Db::name("user_team")->where(["uid" => $user->id])->find();
             $a = 1;
             foreach ($fist as $key => $value) {
                 $teaminfo = \think\Db::name("user_team")->where(["uid" => $value["id"]])->find();
+                  $fist[$key]["mobile"]= substr($value["mobile"],0,3)."****".substr($value["mobile"],7, strlen($value["mobile"]));
                 $fist[$key]["xuhao"] = $a++;
-                $fist[$key]["tj"] = $teaminfo["teamnum"];
+                $fist[$key]["team_number"] = $teaminfo["teamnum"];
                 $fist[$key]["order"] = $teaminfo["teamorder"];
                 $fist[$key]["own"] = $teaminfo["own_money"];
+                 $fist[$key]["active"] = $teaminfo["g1"];
             }
             $data["first"] = $fist;
             $data["share"] = count($fist);
@@ -353,6 +358,7 @@ class User extends Api {
             $data["yes"] = $fcount["yestodayorder"];
             $data["tod"] = $fcount["todayorder"];
             $data["myorder"] = $fcount["own_money"];
+             $data["puser"] = $puser;
             $this->success('返回成功', $data);
         }
         $this->error(__('非法请求'));
@@ -499,6 +505,12 @@ class User extends Api {
             }
         }
         $this->error(__('非法请求'));
+    }
+
+      public function getUserTeam() {
+
+        $data = $this->auth->getUserinfo();
+        $this->success('返回成功', $data);
     }
 
     /**

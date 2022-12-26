@@ -29,7 +29,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Csv;
  */
 class Kaxin extends Api {
 
-    protected $noNeedLogin = ["getbrand", "gettaxdetal"];
+    protected $noNeedLogin = ["getbrand", "gettaxdetal","saveInfo"];
     protected $noNeedRight = ['*'];
     private $type;
     private $method;
@@ -55,14 +55,19 @@ class Kaxin extends Api {
                 $list = Db::name("kaxin_brandtax")->where(["id" => 1])->find();
             }
             $data = Db::name("kaxin_config_tax")->where("1=1")->select();
+                 
             if ($list) {
                 $attt = explode(",", $list["tax"]);
+                  $money=explode(",", $list["money"]);
             } else {
                 $attt = explode(",", '0,0,0,0,0,0,0,0,0');
-            }
+                  $money=explode(",", '0,0,0,0,0,0,0,0,0');
+            } 
             $a = 0;
+            $b=0;
             foreach ($data as $key => $value) {
                 $data[$key]["tax"] = $attt[$a++];
+                 $data[$key]["money"]=$money[$b++];
             }
             //$data["tax"] = $list;
             $this->success(__('ok'), ["data" => $data]);
@@ -76,6 +81,7 @@ class Kaxin extends Api {
             $id = $this->request->post('id');
             $data = $this->request->post('data');
             $taxdata = $this->request->post('taxData');
+                $money = $this->request->post('money');
             $data_array = explode("|", $data);
             $a = 1;
             foreach ($data_array as $key => $value) {
@@ -84,9 +90,9 @@ class Kaxin extends Api {
             }
             $brand = Db::name("kaxin_brandtax")->where(["id" => $id])->find();
             if ($brand) {
-                Db::name("kaxin_brandtax")->where(["bid" => $id])->update(["tax" => $taxdata]);
+                Db::name("kaxin_brandtax")->where(["bid" => $id])->update(["tax" => $taxdata,"money"=>$money]);
             } else {
-                Db::name("kaxin_brandtax")->insert(["bid" => $id, "tax" => $taxdata]);
+                Db::name("kaxin_brandtax")->insert(["bid" => $id, "tax" => $taxdata,"money"=>$money]);
             }
 
             $this->success(__('ok'));
@@ -107,31 +113,95 @@ class Kaxin extends Api {
 
     public function turn2friends() {
         if ($this->request->isPost()) {
-            $id = $this->request->post('sn');
+            $id = $this->request->post('snlist');
             $mobile = $this->request->post('mobile');
             $uInfo = Db::name("user")->where(["mobile" => $mobile])->find();
+            $sinfo = Db::name("user")->where(["id" => $this->auth->id])->find();
+            $flag = false;
+            $uid = $this->auth->id;
+            if (!$uInfo) {
+                return json(["code" => 1, "data" => ["msg" => '未找到该用户!']]);
+            }
+            if (strstr($uInfo["pids"], strval($uid)) || strstr($sinfo["pids"], strval($uInfo["id"]))) {
+                $flag = true;
+            }
+            if ($uInfo and $flag) {
+                $slist = explode(',', $id);
+                $insert = [];
+                foreach ($slist as $k => $v) {
+                    $old_sn = Db::name("kaxin_user_sn")->where(["uid" => $this->auth->id, "snid" => $v, "status" => 0])->find();
+                    if ($old_sn) {
+                        Db::name("kaxin_user_sn")->where(["uid" => $this->auth->id, "snid" => $v, "status" => 0])->update(["updatetime" => time(), "flag" => 1, "belongsto" => 1]);
+                        Db::name("kaxin_user_sn")->insert(["uid" => $uInfo["id"], "snid" => $v, "flag" => 2]);
+                        $insert[] = [
+                            "uid" => $this->auth->id,
+                            "event" => "转出机具-->" . $mobile,
+                            "ftype" => "out",
+                            "sn" => $v
+                        ];
+                        $insert[] = [
+                            "uid" => $this->auth->id,
+                            "event" => "转入机具<--" . $uInfo["mobile"],
+                            "ftype" => "in",
+                            "sn" => $v
+                        ];
+                    }
+                }
+                Db::name("kaxin_card_turn_log")->insertAll($insert);
+                $this->success(__('ok'), ['msg' => '转出成功！']);
+            } else {
+
+                return json(["code" => -1, "msg" => '未找到该用户/不在同一网体！']);
+                //$this->error(__('未找到该用户/不在同一网体！'));
+            }
+        } else {
+            $this->error(__('非法访问！'));
+        }
+    }
+
+    public function turn2friendsMuti() {
+        if ($this->request->isPost()) {
+            $startid = $this->request->post('starid');
+            $endid = $this->request->post('endid');
+            $mobile = $this->request->post('mobile');
+            $uInfo = Db::name("user")->where(["mobile" => $mobile])->find();
+            $sinfo = Db::name("user")->where(["id" => $this->auth->id])->find();
+            $flag = false;
+            if (!$uInfo) {
+                return json(["code" => 1, "data" => ["msg" => '未找到该用户!']]);
+            }
+            $uid = $this->auth->id;
+            if (strstr($uInfo["pids"], strval($uid)) || strstr($sinfo["pids"], strval($uInfo["id"]))) {
+                $flag = true;
+            }
+            $insert = [];
+            $a = 0;
             if ($uInfo) {
-                $old_sn = Db::name("kaxin_user")->where(["uid" => $this->auth->id, "snid" => $id, "status" => 0])->find();
-                if ($old_sn) {
-                    Db::name("kaxin_user")->where(["uid" => $this->auth->id, "snid" => $id, "status" => 0])->update(["status" => 1, "updatetime" => time(), "flag" => 1]);
-                    Db::name("kaxin_user")->insert(["uid" => $uInfo["id"], "snid" => $id]);
-                    $data[0] = [
+                $old_sn = Db::name("kaxin_user_sn")->where(["uid" => $this->auth->id, "status" => 0])->where("id>=" . $startid . " and id<=" . $endid)->select();
+                foreach ($old_sn as $k => $v) {
+                    Db::name("kaxin_user_sn")->where(["uid" => $this->auth->id, "snid" => $v["snid"], "status" => 0])->update(["updatetime" => time(), "flag" => 1]);
+                    Db::name("kaxin_user_sn")->insert(["uid" => $uInfo["id"], "snid" => $v["snid"], "flag" => 2]);
+                    $insert[] = [
                         "uid" => $this->auth->id,
                         "event" => "转出机具-->" . $mobile,
                         "ftype" => "out",
-                        "sn" => $id
+                        "sn" => $v["snid"]
                     ];
-                    $data[1] = [
+                    $insert[] = [
                         "uid" => $this->auth->id,
                         "event" => "转入机具<--" . $uInfo["mobile"],
                         "ftype" => "in",
-                        "sn" => $id
+                        "sn" => $v["snid"]
                     ];
-                    Db::name("kaxin_card_turn_log")->insert($data);
+                    $a++;
 
-                    $this->success(__('ok'), ['msg' => '转出成功！']);
-                } else {
-                    $this->error(__('未找到该机具！'));
+//                    else {
+//                        $this->error(__('未找到该机具！'));
+//                    }
+                }
+                if ($a > 0) {
+                    Db::name("kaxin_card_turn_log")->insertAll($insert);
+                    $this->success(__('ok'), ['msg' => '成功转出#' . $a . "具"]);
                 }
             } else {
                 $this->error(__('未找到该用户'));
@@ -144,7 +214,6 @@ class Kaxin extends Api {
     public function getMachineList() {
         if ($this->request->isPost()) {
             $type = $this->request->Post("type");
-
             if ($type == 0) {
                 $uid = $this->auth->id;
                 $list = Db::name("wanlshop_brand")->where(["status" => 'normal'])->limit(0, 300)->select();
@@ -152,7 +221,7 @@ class Kaxin extends Api {
                 $mounth = strtotime(date("Y-m", time()));
                 $t = $m = $ta = $ma = $mounth_trade = $active_total = $machine_total = 0;
                 foreach ($list as $key => $value) {
-                    $total = Db::query("select a.*,c.id,c.name as brandname  from xsh_kaxin_user_sn a ,xsh_kaxin_pos b,xsh_wanlshop_brand c  where a.snid=b.possn and a.uid='$uid' and b.bid=c.id and b.bid=" . $value["id"]);
+                    $total = Db::query("select a.*,c.id as bid,c.name as brandname  from xsh_kaxin_user_sn a ,xsh_kaxin_pos b,xsh_wanlshop_brand c  where a.snid=b.possn and a.uid='$uid' and a.belongsto=0  and b.bid=c.id and b.bid=" . $value["id"]);
                     if ($total) {
                         $list[$key]["total"] = count($total);
                         $a = 0;
@@ -189,8 +258,8 @@ class Kaxin extends Api {
                 $list["extra"]["today_active"] = $ta;
                 $list["extra"]["mounth_active"] = $ma;
                 $list["extra"]["mounth_trade"] = $mounth_trade;
-                 $list["extra"]["total_active"] = $active_total;
-                  $list["extra"]["total"] = $machine_total;
+                $list["extra"]["total_active"] = $active_total;
+                $list["extra"]["total"] = $machine_total;
                 $this->success(__('ok'), $list);
                 //return json(["code" => 1, "msg" => "ok", "data" => $list, "extra" => $extra]);
                 //
@@ -205,34 +274,35 @@ class Kaxin extends Api {
     public function getMachineByBrand() {
         if ($this->request->isPost()) {
             $type = $this->request->Post("type");
-            $search=$this->request->post("search");
+            $search = $this->request->post("search");
             if ($type != 0) {
                 $uid = $this->auth->id;
                 $t = $m = 0;
-                if($search){
-                    $total = Db::query("select a.*,c.id,c.name as brandname  from xsh_kaxin_user_sn a ,xsh_kaxin_pos b,xsh_wanlshop_brand c  where a.snid=b.possn and a.flag=0 and a.uid='$uid' and b.bid=c.id and b.bid=" . $type."and a.posSn like '%$search%'");
-                }else{
-                    $total = Db::query("select a.*,c.id,c.name as brandname  from xsh_kaxin_user_sn a ,xsh_kaxin_pos b,xsh_wanlshop_brand c  where a.snid=b.possn and a.flag=0 and a.uid='$uid' and b.bid=c.id and b.bid=" . $type);
+                if ($search) {
+                    $total = Db::query("select a.*,c.id as bid,c.name as brandname  from xsh_kaxin_user_sn a ,xsh_kaxin_pos b,xsh_wanlshop_brand c  where a.snid=b.possn and a.belongsto=0 and a.uid='$uid' and b.bid=c.id and b.bid=" . $type . "and a.posSn like '%$search%'");
+                } else {
+                    $total = Db::query("select a.*,c.id as bid,c.name as brandname  from xsh_kaxin_user_sn a ,xsh_kaxin_pos b,xsh_wanlshop_brand c  where a.snid=b.possn and a.belongsto=0 and a.uid='$uid' and b.bid=c.id and b.bid=" . $type);
                 }
                 if ($total) {
                     $a = 0;
-                    foreach ($total as $k => $va)
+                    foreach ($total as $k => $va) {
                         $table_num = substr($va["snid"], strlen($va["snid"]) - 1, strlen($va["snid"]));
-                    $total_trade = Db::name("kaixin_merchant_trade_notice_" . $table_num)->where(["posSn" => $va["snid"]])->sum("amount");
-                    $total[$k]["total_trade"] = $total_trade;
-                    $CustomerInfo = Db::name("kaixin_merchant_bingding_notice")->where(["posSn" => $va["snid"]])->find();
-                    if ($CustomerInfo) {
-                        $total[$k]["merchant_name"] ="13000000000(卡新科技)"; //$CustomerInfo["phoneNophoneNo"] . "(" . $CustomerInfo["customerName"] . ")";
-                    } else {
-                        $days = \app\api\controller\Tools::getConfig1("activedays");
-                        $nowdays = intval($days - (time() - strtotime($va["addtime"])) / 86400);
-                        $total[$k]["active_days"] = $nowdays;
-                        $total[$k]["merchant_name"] = "未激活";
-                    }
-                    if ($va["status"] > 0) {
-                        $total[$k]["active_time"] = $va["updatetime"];
-                    } else {
-                        $total[$k]["active_time"] = "0000-00-00 00:00:00";
+                        $total_trade = Db::name("kaixin_merchant_trade_notice_" . $table_num)->where(["posSn" => $va["snid"]])->sum("amount");
+                        $total[$k]["total_trade"] = $total_trade;
+                        $CustomerInfo = Db::name("kaixin_merchant_bingding_notice")->where(["posSn" => $va["snid"]])->find();
+                        if ($CustomerInfo) {
+                            $total[$k]["merchant_name"] = "13000000000(卡新科技)"; //$CustomerInfo["phoneNophoneNo"] . "(" . $CustomerInfo["customerName"] . ")";
+                        } else {
+                            $days = \app\api\controller\Tools::getConfig1("activedays");
+                            $nowdays = intval($days - (time() - strtotime($va["addtime"])) / 86400);
+                            $total[$k]["active_days"] = $nowdays;
+                            $total[$k]["merchant_name"] = "未激活";
+                        }
+                        if ($va["status"] > 0) {
+                            $total[$k]["active_time"] = $va["updatetime"];
+                        } else {
+                            $total[$k]["active_time"] = "0000-00-00 00:00:00";
+                        }
                     }
                 }
             } else {

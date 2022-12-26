@@ -29,8 +29,9 @@ class Dosth {
     }
 
     public function dorelease() {
+
         $list = Db::table("static_instance")->where("1=1")->where("remain_num", ">", 0)->select();
-    //  $list = Db::table("static_instance")->where("user_id=2598")->where("remain_num", ">", 0)->select();
+        // $list = Db::table("static_instance")->where("user_id=2980")->where("remain_num", ">", 0)->select();
         $taxInfo = $this->getConfig('release_rate');
         if ($taxInfo) {
             $tax = $taxInfo["s_value"];
@@ -38,32 +39,41 @@ class Dosth {
             $tax = 0.002;
         }
         $diress = $this->getConfig('distribution');
+        $delaytime = $this->zgetConfig('delaytime');
+        var_dump($delaytime);
         $dire = $diress["s_value"];
-        $first = explode(":", $dire)[0];
-        $second = explode(":", $dire)[1];
+        $first = 1; //explode(":", $dire)[0];
+        $second = 1; // explode(":", $dire)[1];
 
         foreach ($list as $key => $value) {
+            if (time() < $value["create_time"] + $delaytime * 86400) {
+                return;
+            }
             $uinfo = Db::name("user")->where(["id" => $value["user_id"]])->find();
             if ($uinfo["noget"] != 'hidden') {
-                $score = $value['total_num'] * $tax;
+                if ($uinfo["score"] > 0) {
+                    $score = $value['total_num'] * $uinfo["score"] / 30;
+                } else {
+                    $score = $value['total_num'] * 0.1 / 30;
+                }
                 if ($score <= $value["remain_num"]) {
-                    self::money($score * $first, $value["user_id"], "每日静态释放", 'sys', 1);
-                    self::score($value["user_id"], $score * $second, "每日静态释放", 'sys', 1, 1);
+                    self::money($score * $first, $value["user_id"], "每日收益", 'sys', 1);
+                    // self::score($value["user_id"], $score * $second, "每日静态释放", 'sys', 1, 1);
                     Db::table("static_instance")->where(["id" => $value["id"]])->setDec("remain_num", $score);
                     Db::table("static_instance")->where(["id" => $value["id"]])->setInc("was_num", $score);
                     if ($uinfo["onlystatic"] == 'hidden') {
                         $this->fatherlistfunds($value["user_id"], $score, $first, $second);
-                        $this->liudan($value["user_id"], $score, $first, $second, $value["create_time"]);
+                        ///$this->liudan($value["user_id"], $score, $first, $second, $value["create_time"]);
                     }
                 } else {
                     if ($value["remain_num"] > 0) {
-                        self::money($value["user_id"], $value["remain_num"] * $first, "每日静态释放", 'sys', 1);
-                        self::score($value["user_id"], $value["remain_num"] * $second, "每日静态释放", 'sys', 1, 1);
+                        self::money($value["user_id"], $value["remain_num"] * $first, "每日收益", 'sys', 1);
+                        //  self::score($value["user_id"], $value["remain_num"] * $second, "每日静态释放", 'sys', 1, 1);
                         Db::table("static_instance")->where(["id" => $value["id"]])->setDec("remain_num", $value["remain_num"]);
-                         Db::table("static_instance")->where(["id" => $value["id"]])->setInc("was_num", $value["remain_num"]);
+                        Db::table("static_instance")->where(["id" => $value["id"]])->setInc("was_num", $value["remain_num"]);
                         if ($uinfo["onlystatic"] == 'hidden') {
                             $this->fatherlistfunds($value["user_id"], $value["remain_num"], $first, $second);
-                            $this->liudan($value["user_id"], $score, $first, $second, $value["create_time"]);
+                            // $this->liudan($value["user_id"], $score, $first, $second, $value["create_time"]);
                         }
                     }
                 }
@@ -72,108 +82,148 @@ class Dosth {
     }
 
     public function fatherlistfunds($uid, $money, $first, $second) {
+
         $uInfo = Db::name("user")->where(["id" => $uid])->find();
         $uccname = $uInfo["nickname"];
         $pids = explode(",", $uInfo["pids"]);
-        if ($pids) {
-            if (isset($pids[0]) and $pids[0] > 0) {
-                $taxInfo = $this->getConfig('direct_rate');
-                if ($taxInfo) {
-                    $tax = $taxInfo["s_value"];
-                } else {
-                    $tax = 0.5;
+        dump($money);
+        dump($pids);
+//        if ($pids) {
+//            if (isset($pids[0]) and $pids[0] > 0) {
+//                $taxInfo = $this->getConfig('direct_rate');
+//                if ($taxInfo) {
+//                    $tax = $taxInfo["s_value"];
+//                } else {
+//                    $tax = 0.5;
+//                }
+//                $tax = 0.2;
+//                $pInfo = [];
+//                $score = 0;
+//                $pInfo = Db::table("static_instance")->where(["user_id" => $pids[0]])->where("remain_num", ">", 0)->find();
+//                if ($pInfo and $uInfo["nodyc"] == 'normal') {
+//                    if ($pInfo["remain_num"] >= $money * $tax) {
+//                        $score = $money * $tax;
+//                    } else {
+//                        $score = $pInfo["remain_num"];
+//                    }
+//                    self::money($score * $first, $pids[0], "直推奖励__" . $uid . "_" . $uccname, 'sys', 2);
+//                    // self::score($pids[0], $score * $second, "直推奖励__" . $uid . "_" . $uccname, 'sys', 2, 2);
+//                    Db::table("static_instance")->where(["id" => $pInfo["id"]])->setDec("remain_num", $score);
+//                    Db::table("static_instance")->where(["id" => $pInfo["id"]])->setInc("was_num", $score);
+//                   $ppinfo= Db::name("user")->where(["id"=>$pids[0]])->find();
+//                    if($ppinfo["level"]>1){
+//                        $this->fathermanage($pids[0],$score * $first);
+//                    }
+//                    
+//                }
+//            }
+        //暂时注释 。以后备用间推奖励
+        //            if (isset($pids[1]) and $pids[1] > 0) {
+        //                $taxInfo = $this->getConfig('push_rate');
+        //                if ($taxInfo) {
+        //                    $tax = $taxInfo["value"];
+        //                } else {
+        //                    $tax = 0.1;
+        //                }
+        //                  $pInfo=[];
+        //                $score=0;
+        //                $pInfo22 = Db::table("static_instance")->where(["user_id" => $pids[1]])->where("remain_num", ">", 0)->find();
+        //                if ($pInfo22 and $uInfo["nodyc"] == 'normal') {
+        //                    if ($pInfo22["remain_num"] >= $money * $tax) {
+        //                        $score = $money * $tax;
+        //                    } else {
+        //                        $score = $pInfo22["remain_num"];
+        //                    }
+        ////                    echo "间推推_".$pids[0]."_积分_".$score."_剩余_".$pInfo["remain_num"]."_来源id_".$pInfo["id"]."_直推id_".$pids[0]."<br/>";
+        //                    self::money($score * $first, $pids[1], "间推奖励__" . $uid . "_" . $uccname, 'sys', 3);
+        //                    self::score($pids[1], $score * $second, "间推奖励__" . $uid . "_" . $uccname, 'sys', 3, 3);
+        //                    Db::table("static_instance")->where(["id" => $pInfo22["id"]])->setDec("remain_num", $score);
+        //                    Db::table("static_instance")->where(["id" => $pInfo22["id"]])->setInc("was_num", $score);
+        //                }
+        //            }
+        $aj = [0.1, 0.15, 0.2, 0.25, 0.3];
+        $sa = false;
+        $m = 1;
+        $level = $frontrate = $templevel = $temp = 0;
+        foreach ($pids as $key => $value) {
+            $un = Db::name("user")->where(["id" => $value])->find();
+            $pInfo = [];
+            $score = 0;
+            if (true) {
+                $rate = $un["score"];
+                if ($rate == 0) {
+                    $rate = 0.1;
                 }
-                $pInfo=[];
-                $score=0;
-                $pInfo = Db::table("static_instance")->where(["user_id" => $pids[0]])->where("remain_num", ">", 0)->find();
-                if ($pInfo and $uInfo["nodyc"] == 'normal') {
-                    if ($pInfo["remain_num"] >= $money * $tax) {
-                        $score = $money * $tax;
-                    } else {
-                        $score = $pInfo["remain_num"];
-                    }
-                    echo "直推——".$pids[0]."_积分_".$score."_剩余_".$pInfo["remain_num"]."_来源id_".$pInfo["id"]."_直推id_".$pids[0]."<br/>";
-                    self::money($score * $first, $pids[0], "直推奖励__" . $uid . "_" . $uccname , 'sys', 2);
-                    self::score($pids[0], $score * $second, "直推奖励__" . $uid . "_" . $uccname, 'sys', 2, 2);
-                    Db::table("static_instance")->where(["id" => $pInfo["id"]])->setDec("remain_num", $score);
-                    Db::table("static_instance")->where(["id" => $pInfo["id"]])->setInc("was_num", $score);
-                }
-            }
-            if (isset($pids[1]) and $pids[1] > 0) {
-                $taxInfo = $this->getConfig('push_rate');
-                if ($taxInfo) {
-                    $tax = $taxInfo["value"];
-                } else {
-                    $tax = 0.1;
-                }
-                  $pInfo=[];
-                $score=0;
-                $pInfo22 = Db::table("static_instance")->where(["user_id" => $pids[1]])->where("remain_num", ">", 0)->find();
-                if ($pInfo22 and $uInfo["nodyc"] == 'normal') {
-                    if ($pInfo22["remain_num"] >= $money * $tax) {
-                        $score = $money * $tax;
-                    } else {
-                        $score = $pInfo22["remain_num"];
-                    }
-//                    echo "间推推_".$pids[0]."_积分_".$score."_剩余_".$pInfo["remain_num"]."_来源id_".$pInfo["id"]."_直推id_".$pids[0]."<br/>";
-                    self::money($score * $first, $pids[1], "间推奖励__" . $uid . "_" . $uccname, 'sys', 3);
-                    self::score($pids[1], $score * $second, "间推奖励__" . $uid . "_" . $uccname, 'sys', 3, 3);
-                    Db::table("static_instance")->where(["id" => $pInfo22["id"]])->setDec("remain_num", $score);
-                    Db::table("static_instance")->where(["id" => $pInfo22["id"]])->setInc("was_num", $score);
-                }
-            }
-
-           $aj = [0.1, 0.2, 0.3, 0.4, 0.5];
-            $sa = false;
-            $m = 1;
-            $level = $frontrate = $templevel = $temp = 0;
-            foreach ($pids as $key => $value) {
-                $un = Db::name("user")->where(["id" => $value])->find();
-                $pInfo=[];
-                $score=0;
-                if ($un["level"] > 0) {
-                    $rate = $aj[$un["level"] - 1];
-                    if ($temp < $rate) {
-                        $frontrate = $aj[$un["level"] - 1] - $temp;
-                        $pInfo33 = Db::table("static_instance")->where(["user_id" => $value])->where("remain_num", ">", 0)->find();
-                        if ($pInfo33 and $uInfo["nodyc"] == 'normal') {
-                            if ($pInfo33["remain_num"] >= $money * $frontrate) {
-                                $score = $money * $frontrate;
-                            } else {
-                                $score = $pInfo33["remain_num"];
-                            }
-                            self::money($score * $first, $value, "团队奖励__" . $uid . "_" . $uccname, 'sys', 5);
-                            self::score($value, $score * $second, "团队奖励__" . $uid . "_" . $uccname, 'sys', 5, 5);
-                            Db::table("static_instance")->where(["id" => $pInfo33["id"]])->setDec("remain_num", $score);
-                            Db::table("static_instance")->where(["id" => $pInfo33["id"]])->setInc("was_num", $score);
-                            $sa = false;
-                            $m++;
+                if ($temp < $rate) {
+                    $frontrate = $rate - $temp;
+                    $pInfo33 = Db::table("static_instance")->where(["user_id" => $value])->where("remain_num", ">", 0)->find();
+                    if ($pInfo33 and $uInfo["nodyc"] == 'normal') {
+                        if ($pInfo33["remain_num"] >= $money * $frontrate) {
+                            $score = $money * $frontrate;
+                        } else {
+                            $score = $pInfo33["remain_num"];
                         }
-                        $temp = $rate;
-                    } else {
-
-                        if ($temp > 0 and $temp == $aj[$un["level"] - 1] and!$sa and $un["level"] > 0) {
-                            $pInfo44 = Db::table("static_instance")->where(["user_id" => $value])->where("remain_num", ">", 0)->find();
-                            if ($pInfo and $uInfo["nodyc"] == 'normal') {
-                                if ($pInfo["remain_num"] >= $money * $frontrate) {
-                                    $score = $money * $frontrate;
-                                } else {
-                                    $score = $pInfo44["remain_num"];
-                                }
-                                self::money($score * $first * 0.1, $value, "平级奖励__" . $uid . "_" . $uccname, 'sys', 6);
-                                self::score($value, $score * $second * 0.1, "平级奖励__" . $uid . "_" . $uccname, 'sys', "_" . $uid . "_" . $uccname, 6);
-                                Db::table("static_instance")->where(["id" => $pInfo44["id"]])->setDec("remain_num", $score);
-                                Db::table("static_instance")->where(["id" => $pInfo44["id"]])->setInc("was_num", $score);
-                                $sa = true;
-                                $m = 1;
-                            }
-                        }
+                        self::money($score * $first, $value, "团队奖励__" . $uid . "_" . $uccname, 'sys', 5);
+                        //self::score($value, $score * $second, "团队奖励__" . $uid . "_" . $uccname, 'sys', 5, 5);
+                        Db::table("static_instance")->where(["id" => $pInfo33["id"]])->setDec("remain_num", $score);
+                        Db::table("static_instance")->where(["id" => $pInfo33["id"]])->setInc("was_num", $score);
+                        $this->fathermanageLevel($value, $score * $first);
+                        $sa = false;
+                        $m++;
                     }
+                    $temp = $rate;
+                } else {
+//                        if ($temp > 0 and $temp == $aj[$un["level"] - 2] and !$sa and $un["level"] > 0) {
+//                            $pInfo44 = Db::table("static_instance")->where(["user_id" => $value])->where("remain_num", ">", 0)->find();
+//                           
+//                            if ($pInfo44 and $uInfo["nodyc"] == 'normal') {
+//                                   
+//                               $frontrate=0.2;
+//                                if ($pInfo44["remain_num"] >= $money * $frontrate) {
+//                                    $score = $money * $frontrate;
+//                                } else {
+//                                    $score = $pInfo44["remain_num"];
+//                                }
+//                          
+//                                self::money($score * $first * 0.1, $value, "管理奖励__" . $uid . "_" . $uccname, 'sys', 6);
+//                                //  self::score($value, $score * $second * 0.1, "平级奖励__" . $uid . "_" . $uccname, 'sys', "_" . $uid . "_" . $uccname, 6);
+//                                Db::table("static_instance")->where(["id" => $pInfo44["id"]])->setDec("remain_num", $score);
+//                                Db::table("static_instance")->where(["id" => $pInfo44["id"]])->setInc("was_num", $score);
+//                               // $this->fathermanageLevel($value,$score * $first);
+//                                $sa = true;
+//                                $m = 1;
+//                            }
+//                        }
+                    // }
                 }
             }
         }
     }
-    
+
+    public function fathermanage($uid, $money) {
+        $uinfo = Db::name("user")->where(["id" => $uid])->find();
+        if ($uinfo["pid"] > 0) {
+            $pinfo = Db::name("user")->where(["id" => $uinfo["pid"]])->find();
+            if ($uinfo["level"] == $pinfo["level"]) {
+                self::money($money * 0.2, $pinfo["id"], "管理奖励__" . $uid . "_" . $uinfo["nickname"], 'sys', 6);
+                Db::table("static_instance")->where(["id" => $pinfo["id"]])->setDec("remain_num", $money * 0.2);
+                Db::table("static_instance")->where(["id" => $pinfo["id"]])->setInc("was_num", $money * 0.2);
+            }
+        }
+    }
+
+    public function fathermanageLevel($uid, $money) {
+        $uinfo = Db::name("user")->where(["id" => $uid])->find();
+        if ($uinfo["pid"] > 0) {
+            $pinfo = Db::name("user")->where(["id" => $uinfo["pid"]])->find();
+            if ($pinfo["level"] > 1) {
+                self::money($money * 0.2, $pinfo["id"], "管理奖励__" . $uid . "_" . $uinfo["nickname"], 'sys', 6);
+                Db::table("static_instance")->where(["id" => $pinfo["id"]])->setDec("remain_num", $money * 0.2);
+                Db::table("static_instance")->where(["id" => $pinfo["id"]])->setInc("was_num", $money * 0.2);
+            }
+        }
+    }
+
     public function liudan($uid, $money, $first, $second, $time) {
 
         $calc = (time() - $time) / 86400;
@@ -188,8 +238,8 @@ class Dosth {
             $loopList = Db::name("user_loop")->where(["uid" => $pids[$day]])->find();
 
             if ($loopList) {
-                $pInfo=[];
-                $score=0;
+                $pInfo = [];
+                $score = 0;
                 $temp = $pids[$day];
                 $pInfo = Db::table("static_instance")->where(["user_id" => $temp])->where("remain_num", ">", 0)->find();
                 if ($pInfo and $uInfo["nodyc"] == 'normal') {
@@ -203,7 +253,6 @@ class Dosth {
                     Db::table("static_instance")->where(["id" => $pInfo["id"]])->setDec("remain_num", $score);
                     Db::table("static_instance")->where(["id" => $pInfo["id"]])->setInc("was_num", $score);
                 }
-        
             }
         }
     }
@@ -280,6 +329,16 @@ class Dosth {
             return $row;
         } else {
             return ['code' => 500, 'msg' => '变更积分失败'];
+        }
+    }
+
+    public function zgetConfig($cname) {
+
+        $configInfo = Db::name("zconfig")->where(["key" => $cname])->find();
+        if ($configInfo) {
+            return $configInfo["value"];
+        } else {
+            return [];
         }
     }
 

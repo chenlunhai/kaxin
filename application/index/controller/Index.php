@@ -15,7 +15,7 @@ class Index extends Frontend {
     protected $noNeedLogin = '*';
     protected $noNeedRight = '*';
     protected $layout = '';
-    
+
 //    public function  lang()
 //    {
 //        $lang = input('?get.lang') ?  input('get.lang') : 'cn';
@@ -35,10 +35,20 @@ class Index extends Frontend {
 //    }
 
     public function Promotion() {
-        echo "8888888888888";
-        dump("7777777777777");
-        return $this->fetch();
+
+        $url = "https://polygon-mumbai.infura.io/v3/0943ca0e1b9648048f49275818022db3";
+        $hastxt = '{"jsonrpc":"2.0","method":"eth_getTransactionByHash","params": ["0x1db5cf9de139cf2a6eb4f7302685bf1fa7314e82130dc939cf539910eb8ba162"],"id":80001}';
+        $result = Http::json_post($url, $hastxt);
+        dump($result);
+        dump(\GuzzleHttp\json_decode($result));
+        dump(hexdec("1d45e"));
+        dump(strstr('21,32,25,145,165,5454,124,224,', '21'));
+
+        if (strstr('1,2,3,2,1,5,48,4,2,', 65) || strstr('21,32,25,145,165,5454,124,224,', '21')) {
+            dump("7777777777777");
+        }
     }
+
     public function index() {
 
 
@@ -123,9 +133,9 @@ class Index extends Frontend {
 //       $test->UserLevel("2611,2610,2609,2607,2604,2603,2601,2600,2598,2597,2596,2595,0");
 //        $sms=new \app\api\controller\wanlshop\Sms();
 //        $sms->sendtest('13077338433','register');
-     
-        $lang=   \think\Cookie::get('think_var');
-        $name= __($lang);
+
+        $lang = \think\Cookie::get('think_var');
+        $name = __($lang);
         $this->assign("lang", $name);
         return $this->view->fetch();
     }
@@ -166,8 +176,8 @@ class Index extends Frontend {
         foreach ($list as $key => $value) {
             $findscore = Db::name("user_score_log")->where(["user_id" => $value["user_id"]])->sum("score") / 0.2;
             if ($value["numwas"] - $findscore > 10) {
-                $a=$value["numwas"] - $findscore;
-                echo $value["user_id"] . "__" . $value["numwas"] . "_____" . $findscore ."__".$a."</br>";
+                $a = $value["numwas"] - $findscore;
+                echo $value["user_id"] . "__" . $value["numwas"] . "_____" . $findscore . "__" . $a . "</br>";
             }
         }
     }

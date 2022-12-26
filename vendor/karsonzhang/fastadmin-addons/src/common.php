@@ -271,6 +271,8 @@ function get_addon_class($name, $type = 'hook', $class = null) {
         default:
             $namespace = "\\addons\\" . $name . "\\" . $class;
     }
+    
+  
     return class_exists($namespace) ? $namespace : '';
 }
 

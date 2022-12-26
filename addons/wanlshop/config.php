@@ -324,6 +324,7 @@ return [
             'minmoney' => '100',
             'monthlimit' => '0',
             'servicefee' => '100',
+            'extrafee'  =>'0'
         ],
         'rule' => '',
         'msg' => '',

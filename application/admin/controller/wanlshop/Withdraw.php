@@ -163,7 +163,7 @@ class Withdraw extends Backend {
                     //  } else {
                     // 更新用户金额
                     $money = $row['money'] + $wiInfo["handingfee"] + $wiInfo["taxes"];
-                    controller('addons\wanlshop\library\WanlPay\WanlPay')->money(+$money, $row['user_id'], '寄售拒绝', 'withdraw', $row['id']);
+                    controller('addons\wanlshop\library\WanlPay\WanlPay')->money(+$money, $row['user_id'], '系統驳回', 'withdraw', $row['id']);
                     // \app\common\model\User::score(-$wiInfo["handingfee"], $wiInfo["user_id"], '拒绝提现返回积分');
                     // Db::name("user")->where(["id" => $wiInfo["user_id"]])->update(["buycoupon" => \app\common\model\User::get($wiInfo["user_id"])["buycoupon"] - $wiInfo["taxes"]]);
                     //}
